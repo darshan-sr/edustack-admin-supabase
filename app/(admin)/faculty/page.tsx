@@ -24,6 +24,7 @@ import {
   SyncOutlined,
 } from "@ant-design/icons";
 import { MdOutlineModeEditOutline } from "react-icons/md";
+import { fetchDepartment, fetchFaculties } from "./actions";
 
 const FacultiesTable: React.FC = () => {
   const [faculties, setFaculties] = useState<any[]>([]);
@@ -35,23 +36,23 @@ const FacultiesTable: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchFaculties();
+    fetchFaculty();
     fetchDepartmentOptions();
   }, []);
 
   const fetchDepartmentOptions = async () => {
     try {
-      const { data, error } = await supabase.from("department").select("*");
+      const { data, error } = await fetchDepartment();
       if (error) throw error;
       setDepartmentOptions(data || []);
     } catch (error: any) {
       console.error("Error fetching faculties:", error.message);
     }
   };
-  const fetchFaculties = async () => {
+  const fetchFaculty = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.from("faculty").select("*");
+      const { data, error } = await fetchFaculties();
       if (error) throw error;
 
       setFaculties(data || []);
@@ -86,7 +87,7 @@ const FacultiesTable: React.FC = () => {
         if (error) throw error;
         message.success("Faculty added successfully");
       }
-      fetchFaculties();
+      fetchFaculty();
       setIsModalVisible(false);
       form.resetFields();
       setEditingFaculty(null);
@@ -104,7 +105,7 @@ const FacultiesTable: React.FC = () => {
         .eq("faculty_id", facultyId);
       if (error) throw error;
       message.success("Faculty deleted successfully");
-      fetchFaculties();
+      fetchFaculty();
     } catch (error: any) {
       console.error("Error deleting faculty:", error.message);
       message.error("An error occurred. Please try again.");
@@ -189,7 +190,7 @@ const FacultiesTable: React.FC = () => {
           <div className="flex flex-row gap-2">
             <Button
               loading={loading}
-              onClick={fetchFaculties}
+              onClick={fetchFaculty}
               icon={<SyncOutlined />}
             >
               Refresh
