@@ -17,6 +17,7 @@ import Link from "next/link";
 
 import { Layout, Menu, Popconfirm, theme } from "antd";
 import { MdLogout, MdSpaceDashboard } from "react-icons/md";
+import { createClient } from "@/utils/supabase/client";
 
 const { SubMenu } = Menu;
 const { Sider } = Layout;
@@ -24,10 +25,14 @@ const { Sider } = Layout;
 const AdminSidebar = () => {
   const pathname = usePathname() || "";
 
+  const supabase = createClient();
+
   const router = useRouter();
 
   const handleSignOut = async () => {
     console.log("signing out");
+    await supabase.auth.signOut();
+    router.replace("/auth/login");
   };
 
   const [collapsed, setCollapsed] = useState(true);
