@@ -35,6 +35,11 @@ const ClassroomsTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
 
+  useEffect(() => {
+    fetchClassrooms();
+    fetchDepartmentOptions();
+  }, []);
+
   const fetchDepartmentOptions = async () => {
     try {
       const { data, error } = await supabase.from("department").select("*");
@@ -126,11 +131,6 @@ const ClassroomsTable: React.FC = () => {
   );
 
   const groupedClassrooms = groupBy(filteredClassrooms, "classroom_department");
-
-  useEffect(() => {
-    fetchClassrooms();
-    fetchDepartmentOptions();
-  }, [fetchClassrooms, fetchDepartmentOptions]);
 
   return (
     <Layout>
