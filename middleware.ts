@@ -57,7 +57,6 @@ export async function middleware(request: NextRequest) {
     const isAdmin = await checkTable("admin", email);
 
     if (isAdmin) {
-      console.log("admin");
       return "admin";
     }
 
@@ -68,8 +67,6 @@ export async function middleware(request: NextRequest) {
 
   let userType = null;
   if (userData?.user?.email) userType = await getUserType(userData.user.email);
-
-  console.log("userType", userType);
 
   if (request.nextUrl.pathname === "/" && !userType) {
     return NextResponse.rewrite(new URL("/auth/login", request.url));

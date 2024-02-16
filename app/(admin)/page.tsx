@@ -1,12 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  Table,
+  Card,
   Button,
   Modal,
   Form,
   Input,
-  Popconfirm,
   Layout,
   Breadcrumb,
   message,
@@ -23,6 +22,7 @@ import {
   SyncOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
+import { groupBy } from "lodash";
 
 const ClassroomsTable: React.FC = () => {
   const [classrooms, setClassrooms] = useState<any[]>([]);
@@ -31,7 +31,8 @@ const ClassroomsTable: React.FC = () => {
   const [editingClassroom, setEditingClassroom] = useState<any>(null);
   const supabase = createClient();
   const [departmentOptions, setDepartmentOptions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [searchText, setSearchText] = useState<string>("");
 
   useEffect(() => {
     fetchClassrooms();
@@ -51,6 +52,7 @@ const ClassroomsTable: React.FC = () => {
   const fetchClassrooms = async () => {
     try {
       setLoading(true);
+
       const { data, error } = await supabase.from("classroom").select("*");
       if (error) throw error;
       setClassrooms(data || []);
@@ -119,82 +121,19 @@ const ClassroomsTable: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const columns = [
-    {
-      title: "Classroom ID",
-      dataIndex: "classroom_id",
-      key: "classroom_id",
-    },
-    {
-      title: "Batch",
-      dataIndex: "classroom_batch",
-      key: "classroom_batch",
-    },
-    {
-      title: "Name",
-      dataIndex: "classroom_name",
-      key: "classroom_name",
-    },
-    {
-      title: "Department",
-      dataIndex: "classroom_department",
-      key: "classroom_department",
-    },
-    {
-      title: "Semester",
-      dataIndex: "classroom_semester",
-      key: "classroom_semester",
-    },
-    {
-      title: "Section",
-      dataIndex: "classroom_section",
-      key: "classroom_section",
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (text: string, record: any) => (
-        <div className="flex flex-row  items-center gap-4">
-          <Button
-            type="primary"
-            onClick={() =>
-              (window.location.href = `/classes/${record.classroom_id}`)
-            }
-            icon={<LinkOutlined />}
-          >
-            Go to Class
-          </Button>
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item
-                  key="1"
-                  icon={<EditOutlined />}
-                  onClick={() => onEdit(record)}
-                >
-                  Edit
-                </Menu.Item>
-                <Menu.Item
-                  key="2"
-                  icon={<DeleteOutlined />}
-                  onClick={() => onDelete(record.classroom_id)}
-                >
-                  Delete
-                </Menu.Item>
-              </Menu>
-            }
-            placement="bottomRight"
-          >
-            <Button shape="circle" icon={<EllipsisOutlined />} />
-          </Dropdown>
-        </div>
-      ),
-    },
-  ];
+  const handleSearch = (value: string) => {
+    setSearchText(value);
+  };
+
+  const filteredClassrooms = classrooms.filter((classroom) =>
+    classroom.classroom_name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  const groupedClassrooms = groupBy(filteredClassrooms, "classroom_department");
 
   return (
     <Layout>
-      <Layout.Content style={{ padding: "0 48px" }} className="h-screen">
+      <Layout.Content style={{ padding: "0 48px" }} className="h-full mb-48">
         <Breadcrumb style={{ margin: "16px 0" }}>
           <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
           <Breadcrumb.Item>Classrooms</Breadcrumb.Item>
@@ -205,6 +144,13 @@ const ClassroomsTable: React.FC = () => {
             Manage Classrooms
           </h4>
           <div className="flex flex-row gap-2">
+            <Input.Search
+              placeholder="Search by classroom name"
+              onChange={(e) => setSearchText(e.target.value)}
+              onSearch={handleSearch}
+              style={{ width: 300 }}
+              allowClear
+            />
             <Button
               loading={loading}
               onClick={fetchClassrooms}
@@ -218,7 +164,117 @@ const ClassroomsTable: React.FC = () => {
           </div>
         </div>
 
-        <Table dataSource={classrooms} columns={columns} loading={loading} />
+        <div>
+          {!loading &&
+            Object.keys(groupedClassrooms).map((departmentId) => (
+              <div key={departmentId}>
+                <h2 className="font-medium text-gray-800 p-2  border-b border-gray-200">
+                  {
+                    departmentOptions.find(
+                      (d) => d.department_id === departmentId
+                    )?.department_name
+                  }
+                </h2>
+                <div className="grid grid-cols-3 gap-4 my-4">
+                  {groupedClassrooms[departmentId]?.map((classroom: any) => (
+                    <Card
+                      key={classroom.classroom_id}
+                      title={classroom.classroom_name}
+                    >
+                      <p>Batch: {classroom.classroom_batch}</p>
+                      <p>Department: {classroom.classroom_department}</p>
+                      <p>Semester: {classroom.classroom_semester}</p>
+                      <p>Section: {classroom.classroom_section}</p>
+
+                      <div className="mt-4 flex justify-end gap-4">
+                        <Button
+                          type="primary"
+                          onClick={() =>
+                            (window.location.href = `/classes/${classroom.classroom_id}`)
+                          }
+                          icon={<LinkOutlined />}
+                        >
+                          Go to Class
+                        </Button>
+                        <Dropdown
+                          overlay={
+                            <Menu>
+                              <Menu.Item
+                                key="1"
+                                icon={<EditOutlined />}
+                                onClick={() => onEdit(classroom)}
+                              >
+                                Edit
+                              </Menu.Item>
+                              <Menu.Item
+                                key="2"
+                                icon={<DeleteOutlined />}
+                                onClick={() => onDelete(classroom.classroom_id)}
+                              >
+                                Delete
+                              </Menu.Item>
+                            </Menu>
+                          }
+                          placement="bottomRight"
+                        >
+                          <Button shape="circle" icon={<EllipsisOutlined />} />
+                        </Dropdown>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
+        </div>
+
+        {searchText && filteredClassrooms.length === 0 && !loading && (
+          <div className="flex bg-white items-center flex-col justify-center h-[400px] border rounded-xl mt-4">
+            <p className="text-gray-500">No classrooms found</p>
+            <p className="text-gray-400">
+              Your search for "{searchText}" did not return any results.
+            </p>
+
+            <Button
+              type="link"
+              onClick={showModal}
+              icon={<PlusOutlined />}
+              className="mt-4"
+            >
+              Add New Classroom
+            </Button>
+          </div>
+        )}
+
+        {classrooms.length === 0 && !loading && (
+          <div className="flex bg-white items-center flex-col justify-center h-[400px] border rounded-xl mt-4">
+            <p className="text-gray-500">No classrooms found</p>
+            <p className="text-gray-400">
+              You have not added any classrooms yet. Click the button below to
+              add a new classroom.
+            </p>
+
+            <Button
+              type="link"
+              onClick={showModal}
+              icon={<PlusOutlined />}
+              className="mt-4"
+            >
+              Add New Classroom
+            </Button>
+          </div>
+        )}
+
+        {loading && (
+          <div className="flex bg-white items-center flex-col justify-center h-[400px] border rounded-xl mt-4">
+            <SyncOutlined
+              spin
+              style={{ fontSize: 24, color: "rgb(107 114 128)" }}
+              className="gray-400"
+            />
+            <p className="text-gray-500 mt-4">Loading classrooms...</p>
+          </div>
+        )}
+
         <Modal
           title={editingClassroom ? "Edit Classroom" : "Add New Classroom"}
           open={isModalVisible}
@@ -234,7 +290,7 @@ const ClassroomsTable: React.FC = () => {
                 { required: true, message: "Please enter classroom name!" },
               ]}
             >
-              <Input variant="filled" />
+              <Input variant="filled" placeholder="Enter classroom name" />
             </Form.Item>
             <Form.Item
               label="Year of Batch"
@@ -243,7 +299,7 @@ const ClassroomsTable: React.FC = () => {
                 { required: true, message: "Please select classroom batch!" },
               ]}
             >
-              <Select variant="filled">
+              <Select variant="filled" placeholder="Select year of batch">
                 {Array.from({ length: 7 }, (_, i) => 2019 + i).map((year) => (
                   <Select.Option key={year} value={year}>
                     {year}
@@ -251,7 +307,6 @@ const ClassroomsTable: React.FC = () => {
                 ))}
               </Select>
             </Form.Item>
-
             <Form.Item
               label="Classroom Department"
               name="classroom_department"
@@ -262,7 +317,10 @@ const ClassroomsTable: React.FC = () => {
                 },
               ]}
             >
-              <Select variant="filled">
+              <Select
+                variant="filled"
+                placeholder="Select classroom department"
+              >
                 {departmentOptions.map((department) => (
                   <Select.Option
                     key={department.department_id}
@@ -283,7 +341,10 @@ const ClassroomsTable: React.FC = () => {
                 },
               ]}
             >
-              <Select variant="filled">
+              <Select
+                variant="filled"
+                placeholder="Select classroom's ongoing semester"
+              >
                 {Array.from({ length: 8 }, (_, i) => i + 1).map((semester) => (
                   <Select.Option key={semester} value={semester}>
                     {semester}

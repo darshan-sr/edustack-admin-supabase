@@ -7,9 +7,9 @@ export default function AdminDashboardLayout({
 }) {
   return (
     <>
-      <nav className="flex flex-row min-w-[100vw]">
+      <nav className="flex flex-row min-w-[100vw] w-full h-full">
         <AdminSidebar />
-        <section className="w-full">{children}</section>
+        <section className="w-full h-full ">{children}</section>
       </nav>
     </>
   );
