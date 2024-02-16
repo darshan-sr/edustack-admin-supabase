@@ -133,7 +133,10 @@ const ClassroomsTable: React.FC = () => {
 
   return (
     <Layout>
-      <Layout.Content style={{ padding: "0 48px" }} className="h-full mb-48">
+      <Layout.Content
+        style={{ padding: "0 48px" }}
+        className="h-full mb-48 min-h-screen"
+      >
         <Breadcrumb style={{ margin: "16px 0" }}>
           <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
           <Breadcrumb.Item>Classrooms</Breadcrumb.Item>
@@ -343,7 +346,7 @@ const ClassroomsTable: React.FC = () => {
             >
               <Select
                 variant="filled"
-                placeholder="Select classroom's ongoing semester"
+                placeholder="Select classroom ongoing semester"
               >
                 {Array.from({ length: 8 }, (_, i) => i + 1).map((semester) => (
                   <Select.Option key={semester} value={semester}>
