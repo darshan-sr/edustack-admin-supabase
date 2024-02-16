@@ -12,6 +12,7 @@ import {
   Select,
   Dropdown,
   Menu,
+  Popconfirm,
 } from "antd";
 import { createClient } from "@/utils/supabase/client"; // import your Supabase client instance
 import {
@@ -209,13 +210,21 @@ const ClassroomsTable: React.FC = () => {
                               >
                                 Edit
                               </Menu.Item>
-                              <Menu.Item
-                                key="2"
-                                icon={<DeleteOutlined />}
-                                onClick={() => onDelete(classroom.classroom_id)}
+
+                              <Popconfirm
+                                title="Are you sure you want to delete this classroom?"
+                                onConfirm={() =>
+                                  onDelete(classroom.classroom_id)
+                                }
                               >
-                                Delete
-                              </Menu.Item>
+                                <Menu.Item
+                                  key="2"
+                                  icon={<DeleteOutlined />}
+                                  danger
+                                >
+                                  Delete
+                                </Menu.Item>
+                              </Popconfirm>
                             </Menu>
                           }
                           placement="bottomRight"
