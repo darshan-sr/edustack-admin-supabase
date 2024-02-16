@@ -35,11 +35,6 @@ const ClassroomsTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
 
-  useEffect(() => {
-    fetchClassrooms();
-    fetchDepartmentOptions();
-  }, []);
-
   const fetchDepartmentOptions = async () => {
     try {
       const { data, error } = await supabase.from("department").select("*");
@@ -131,6 +126,11 @@ const ClassroomsTable: React.FC = () => {
   );
 
   const groupedClassrooms = groupBy(filteredClassrooms, "classroom_department");
+
+  useEffect(() => {
+    fetchClassrooms();
+    fetchDepartmentOptions();
+  }, [fetchClassrooms, fetchDepartmentOptions]);
 
   return (
     <Layout>
@@ -243,7 +243,7 @@ const ClassroomsTable: React.FC = () => {
           <div className="flex bg-white items-center flex-col justify-center h-[400px] border rounded-xl mt-4">
             <p className="text-gray-500">No classrooms found</p>
             <p className="text-gray-400">
-              Your search for "{searchText}" did not return any results.
+              Your search for {searchText} did not return any results.
             </p>
 
             <Button
