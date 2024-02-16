@@ -23,7 +23,6 @@ import {
   SyncOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
-import { groupBy } from "lodash";
 
 const ClassroomsTable: React.FC = () => {
   const [classrooms, setClassrooms] = useState<any[]>([]);
@@ -130,7 +129,18 @@ const ClassroomsTable: React.FC = () => {
     classroom.classroom_name.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const groupedClassrooms = groupBy(filteredClassrooms, "classroom_department");
+  const groupByDepartment = (classrooms: any) => {
+    return classrooms.reduce((acc: any, classroom: any) => {
+      const departmentId = classroom.classroom_department;
+      if (!acc[departmentId]) {
+        acc[departmentId] = [];
+      }
+      acc[departmentId].push(classroom);
+      return acc;
+    }, {});
+  };
+
+  const groupedClassrooms = groupByDepartment(filteredClassrooms);
 
   return (
     <Layout>
