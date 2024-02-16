@@ -165,7 +165,7 @@ const DepartmentsTable: React.FC = () => {
                 { required: true, message: "Please enter department name!" },
               ]}
             >
-              <Input variant="filled" />
+              <Input type="filled" />
             </Form.Item>
           </Form>
         </Modal>
