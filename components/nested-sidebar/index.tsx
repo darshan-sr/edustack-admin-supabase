@@ -22,52 +22,26 @@ const { Sider } = Layout;
 
 const NestedSidebar = ({ params }: { params: { slug: string } }) => {
   const pathname = usePathname() || "";
-  const [ongoingSemester, setOngoingSemester] = useState<string>("");
-  const [classStatus, setClassStatus] = useState<string>("");
-  const router = useRouter();
 
   return (
-    <Layout className=" h-screen min-h-screen  z-[48] ">
-      <Sider className="h-full " theme="light">
+    <Layout className=" h-screen min-h-screen bg-gray-400 z-[48] ">
+      <Sider className="h-full ">
         <Menu
           mode="inline"
-          className="w-full h-full"
-          theme="light"
+          className="w-full h-full bg-gray-400"
           defaultSelectedKeys={[pathname]}
         >
-          <Menu.Item
-            key={`/admin/classes/${params.slug}/students`}
-            icon={<FaUserGroup />}
-          >
-            <Link href={`/admin/classes/${params.slug}/students`}>
-              Students
-            </Link>
+          <div className="flex items-center justify-center h-[68px] mb-5 border-b border-gray-200">
+            <h1 className="text-md font-medium ">{params.slug}</h1>
+          </div>
+          <Menu.Item key={`/class/${params.slug}`} icon={<FaUserGroup />}>
+            <Link href={`/class/${params.slug}`}>Students</Link>
           </Menu.Item>
 
-          <Menu.Item
-            key={`/admin/classes/${params.slug}/subjects`}
-            icon={<FaBook />}
-          >
-            <Link href={`/admin/classes/${params.slug}/subjects`}>
-              Subjects
-            </Link>
+          <Menu.Item key={`/class/${params.slug}/subjects`} icon={<FaBook />}>
+            <Link href={`/class/${params.slug}/subjects`}>Subjects</Link>
           </Menu.Item>
 
-          <Menu.Item
-            key={`/admin/classes/${params.slug}/internals`}
-            icon={<HiDocumentReport />}
-          >
-            <Link href={`/admin/classes/${params.slug}/internals`}>
-              Internals
-            </Link>
-          </Menu.Item>
-
-          <Menu.Item
-            key={`/admin/classes/${params.slug}/SEE`}
-            icon={<RiGraduationCapFill />}
-          >
-            <Link href={`/admin/classes/${params.slug}/SEE`}>SEE</Link>
-          </Menu.Item>
         </Menu>
       </Sider>
     </Layout>

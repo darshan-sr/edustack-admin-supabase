@@ -11,6 +11,7 @@ export default function NestedDashboardLayout({
     <>
       <nav className="flex flex-row min-w-full max-w-full">
         <NestedSidebar params={params} />
+
         <section className="w-full">{children}</section>
       </nav>
     </>

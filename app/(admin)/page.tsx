@@ -23,6 +23,7 @@ import {
   SyncOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 
 const ClassroomsTable: React.FC = () => {
   const [classrooms, setClassrooms] = useState<any[]>([]);
@@ -33,6 +34,8 @@ const ClassroomsTable: React.FC = () => {
   const [departmentOptions, setDepartmentOptions] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
+  const router = useRouter();
+  const [uploadCSVModalVisible, setUploadCSVModalVisible] = useState(false);
 
   useEffect(() => {
     fetchClassrooms();
@@ -194,6 +197,9 @@ const ClassroomsTable: React.FC = () => {
                     <Card
                       key={classroom.classroom_id}
                       title={classroom.classroom_name}
+                      onClick={() =>
+                        router.push(`/class/${classroom.classroom_id}`)
+                      }
                     >
                       <p>Batch: {classroom.classroom_batch}</p>
                       <p>Department: {classroom.classroom_department}</p>
@@ -204,7 +210,7 @@ const ClassroomsTable: React.FC = () => {
                         <Button
                           type="primary"
                           onClick={() =>
-                            (window.location.href = `/classes/${classroom.classroom_id}`)
+                            (window.location.href = `/class/${classroom.classroom_id}`)
                           }
                           icon={<LinkOutlined />}
                         >
